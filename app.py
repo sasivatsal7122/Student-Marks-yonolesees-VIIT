@@ -220,6 +220,7 @@ def main():
         st.caption("Re-accredited by NAAC with 'A++' Grade & NBA")
     st.subheader('Welcome to Student Marks Analysis')
     st.markdown("<p><TT>Designed and Developed by <a style='text-decoration:none;color:red' target='_blank' href='https://github.com/sasivatsal7122'>B.Sasi Vatsal</a></TT></p>", unsafe_allow_html=True)
+    st.caption("20L31A5413 , Department of AI&DS")
     st.sidebar.write("Select the marks excel file to analyze")
     selected_option = st.sidebar.selectbox(
         "Select the Analysis Method",
