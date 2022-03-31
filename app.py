@@ -1,13 +1,21 @@
+from ast import Num
+from distutils.log import error
 import streamlit as st
 import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.express as px
+import difflib
+from difflib import SequenceMatcher
+import math
+
+
 sns.set_theme(context='notebook',style='darkgrid',palette='deep',font='sans-serif',rc={'figure.figsize':(12,8)})
 
 
 def marks_analysis(subject_1):
+            
     sub = pd.read_excel(subject_1)
     sub_code = sub.at[1,"VIGNAN'S INSTITUTE OF INFORMATION TECHNOLOGY (AUTONOMOUS) : VISAKHAPATNAM"]
     sub_name = sub.at[1,"Unnamed: 3"]
@@ -52,15 +60,54 @@ def marks_analysis(subject_1):
             j+=1
     st.text("")
     st.text("")
-    st.subheader("Basic Stats:")
-    st.write("\nThe Average marks are {} marks out of 18 marks".format(round(sub['Total-18M'].mean(),3)))
-    st.write("\nThe Standard Deviation of marks of students is {}".format(round(sub['Total-18M'].std(),3)))
-    st.write("\nStandard Deviation in Part-A is {}".format(round(sub['objective'].std(),3)))
-    st.write("\nStandard Deviation in Part-B is {}".format(round(sub['Total-30M'].std(),3)))
-    if sub['objective'].std() < sub['Total-30M'].std() :
-        st.write("\nStudents performed better in Part-A than Part-B")
-    else:
-        st.write("\nStudents performed better in Part-B than Part-A")
+    
+    bstat1,bstat2 = st.columns(2)
+    with bstat1:
+        st.subheader("Basic Stats:")
+        st.write("\nThe Average marks are {} marks out of 18 marks".format(round(sub['Total-18M'].mean(),3)))
+        st.text("")
+        st.write("\nThe Standard Deviation of marks of students is {}".format(round(sub['Total-18M'].std(),3)))
+        st.text("")
+        st.write("\nStandard Deviation in Part-A is {}".format(round(sub['objective'].std(),3)))
+        st.text("")
+        st.write("\nStandard Deviation in Part-B is {}".format(round(sub['Total-30M'].std(),3)))
+        if sub['objective'].std() < sub['Total-30M'].std() :
+            st.subheader("\nStudents performed better in Part-A than Part-B")
+        else:
+            st.subheader("\nStudents performed better in Part-B than Part-A")
+        data = [{'Part':'objective','Std': sub['objective'].std()},
+        {'Part':'2A','Std': round(sub['2A'].std(),3)},
+        {'Part':'2B','Std': round(sub['2B'].std(),3)},
+        {'Part':'3A','Std': round(sub['3A'].std(),3)},
+        {'Part':'3B','Std': round(sub['3B'].std(),3)},
+        {'Part':'4','Std': round(sub['4'].std(),3)},
+        {'Part':'Total-30M','Std': round(sub['Total-30M'].std(),3)},
+        {'Part':'Total-18M','Std': round(sub['Total-18M'].std(),3)}
+       ]
+        std_df = pd.DataFrame(data)
+        std_df.sort_values(by='Std',inplace=True)
+        std_dict = std_df.to_dict()
+        for x in range(1,8):
+            st.text("")
+            st.write('Standard Deviation of marks in {} is {}'.format(std_dict['Part'][x],std_dict['Std'][x]))
+        st.subheader("\nStudents performed well in {} with least standard deviation of {}".format(std_dict['Part'][1],std_dict['Std'][1]))
+    with bstat2:
+        avg_df = sub.loc[:, sub.columns != 'roll']
+        avg_df = avg_df.mean().to_frame().reset_index()
+        avg_df = avg_df.iloc[1:]
+        avg_df.columns = ['part-wise','avg-marks-obtained']
+        fig = px.bar(avg_df,x='part-wise', y='avg-marks-obtained', text='avg-marks-obtained')
+        fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+        st.subheader("Avg Marks of class")
+        st.plotly_chart(fig)
+        
+        fig = px.pie(std_df, values='Std', names='Part')
+        fig.update_traces(textposition='inside', textinfo='percent+label')
+        st.subheader('Part Wise Standard Deviation')
+        st.plotly_chart(fig)
+        
+    
     m_stats_dict = (sub['Total-18M'].value_counts()).to_dict()
     m_stats = (sub['Total-18M'].value_counts()).to_frame()
     m_stats= m_stats.reset_index()
@@ -114,20 +161,26 @@ def marks_analysis(subject_1):
     st.plotly_chart(fig)
     
     st.subheader("One Student Performance:")
-    rollno = int(st.text_input("Enter roll number","13"))
-    rollno=f'20L31A54{rollno}'
-    std_df = sub.loc[sub['roll']==rollno]
-    std_pivot = std_df.transpose().reset_index()
-    std_pivot= std_pivot.iloc[1:]
-    std_pivot.columns = ['part-wise','marks-obtained']
-    fig = px.bar(std_pivot,y='part-wise', x='marks-obtained', text='marks-obtained', orientation='h',title=f'{rollno} Performance')
-    fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
-    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
-    fig.update_layout(
-        yaxis = dict(autorange="reversed")
-    )
-    st.plotly_chart(fig)
-    
+    st.text("Enter the year followed by last 4 digits")
+    st.text("ex: 20L31A5469 --> 205469")
+    rollno = int(st.text_input("Enter roll number","205413"))
+    try:
+        rollno = difflib.get_close_matches(str(rollno), list(sub['roll']))
+        rollno = rollno[0]
+        std_df = sub.loc[sub['roll']==rollno]
+        std_pivot = std_df.transpose().reset_index()
+        std_pivot= std_pivot.iloc[1:]
+        std_pivot.columns = ['part-wise','marks-obtained']
+        fig = px.bar(std_pivot,y='part-wise', x='marks-obtained', text='marks-obtained', orientation='h',title=f'{rollno} Performance')
+        fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+        fig.update_layout(
+            yaxis = dict(autorange="reversed")
+        )
+        st.plotly_chart(fig)
+    except:
+        print("Invalid roll number entered, try again with valid roll number")
+        
     st.subheader("Find Students who secured more then given min marks")
     x = int(st.text_input("Enter max marks (0-18) : ","16"))
     df = sub.loc[sub['Total-18M']>=x]
@@ -160,25 +213,27 @@ def marks_analysis(subject_1):
         yaxis = dict(autorange="reversed")
     )
     st.plotly_chart(fig)
+    return True
     
-
 def main():
     st.title("Vignan's Institute of Information technology")
     st.subheader('Welcome to Student Marks Analysis')
-    st.text("Designed and Developed by B.SasiVatsal")
-    st.sidebar.write("Select the marks excel file and click analyze")
+    st.markdown("<p><TT>Designed and Developed by <a style='text-decoration:none;color:red' target='_blank' href='https://github.com/sasivatsal7122'>B.Sasi Vatsal</a></TT></p>", unsafe_allow_html=True)
+    st.sidebar.write("Select the marks excel file to analyze")
     selected_option = st.sidebar.selectbox(
         "Select the Analysis Method",
         ("Mid marks - single subject", "Mid marks - multiple subjects", "Sem marks - single subject","Sem marks - Multiple subjects")
     )
     if selected_option == "Mid marks - single subject":
         subject_1 = st.sidebar.file_uploader("Choose a valid excel file")
-        sbtn  = st.sidebar.button('Analyze')
-        if sbtn:
-            marks_analysis(subject_1)
+        #sbtn  = st.sidebar.button('Analyze')
+        if (subject_1):
+            try:
+                marks_analysis(subject_1)
+            except:
+                st.header("Invalid Document Format uploaded, try again with a valid supported File Format")
     else:
         st.subheader("choosed functionality wil be added soon")
         
- 
 if __name__=="__main__":
     main()
