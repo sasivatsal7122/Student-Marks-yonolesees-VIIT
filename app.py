@@ -1,5 +1,6 @@
 from ast import Num
 from distutils.log import error
+from pyparsing import col
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -9,7 +10,7 @@ import plotly.express as px
 import difflib
 from difflib import SequenceMatcher
 import math
-
+from PIL import Image
 
 sns.set_theme(context='notebook',style='darkgrid',palette='deep',font='sans-serif',rc={'figure.figsize':(12,8)})
 
@@ -41,7 +42,7 @@ def marks_analysis(subject_1):
     least5_sub = sub_sorted.tail(5)
     i=1
     j=1
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns((3,3))
     st.text("")
     st.text("")
     with col1:
@@ -96,7 +97,7 @@ def marks_analysis(subject_1):
         avg_df = avg_df.mean().to_frame().reset_index()
         avg_df = avg_df.iloc[1:]
         avg_df.columns = ['part-wise','avg-marks-obtained']
-        fig = px.bar(avg_df,x='part-wise', y='avg-marks-obtained', text='avg-marks-obtained')
+        fig = px.bar(avg_df,x='part-wise', y='avg-marks-obtained', text='avg-marks-obtained',)
         fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
         fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
         st.subheader("Avg Marks of class")
@@ -115,20 +116,14 @@ def marks_analysis(subject_1):
     m_stats.sort_values(by=['Marks'],ascending=False,inplace=True)
     m_stats= m_stats.reset_index()
     m_stats.drop(columns=['index'],inplace=True)
-    marks_class1,marks_class2 = st.columns(2)
+    marks_class1,marks_class2 = st.columns((1,1))
     with marks_class2:
-        st.text("")
-        st.text("")
-        st.text("")
-        st.text("")
-        st.subheader("count of marks obtained")
-        fig = px.bar(m_stats,x="Marks", y="no.of stds", text='no.of stds')
+        st.subheader("Frequency of marks obtained")
+        fig = px.bar(m_stats,x="Marks", y="no.of stds", text='no.of stds',width=950, height=630)
         fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
         fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
-        st.plotly_chart(fig,height=3000)
+        st.plotly_chart(fig)
     with marks_class1:
-        st.text("")
-        st.text("")
         st.subheader("Marks Classification: ")
         for key in reversed(list(sorted(m_stats_dict.keys()))):
             st.write("no.of students who scored {} are {}".format(key,m_stats_dict[key]))
@@ -171,7 +166,7 @@ def marks_analysis(subject_1):
         std_pivot = std_df.transpose().reset_index()
         std_pivot= std_pivot.iloc[1:]
         std_pivot.columns = ['part-wise','marks-obtained']
-        fig = px.bar(std_pivot,y='part-wise', x='marks-obtained', text='marks-obtained', orientation='h',title=f'{rollno} Performance')
+        fig = px.bar(std_pivot,y='part-wise', x='marks-obtained', text='marks-obtained', orientation='h',title=f'{rollno} Performance',width=1100, height=700)
         fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
         fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
         fig.update_layout(
@@ -179,7 +174,7 @@ def marks_analysis(subject_1):
         )
         st.plotly_chart(fig)
     except:
-        print("Invalid roll number entered, try again with valid roll number")
+        st.write("Invalid roll number entered, try again with valid roll number")
         
     st.subheader("Find Students who secured more then given min marks")
     x = int(st.text_input("Enter max marks (0-18) : ","16"))
@@ -216,7 +211,13 @@ def marks_analysis(subject_1):
     return True
     
 def main():
-    st.title("Vignan's Institute of Information technology")
+    col1,col2 = st.columns((1,3))
+    with col1:
+        image = Image.open('Vignan_logo.png')
+        st.image(image)
+    with col2:
+        st.title("Vignan's Institute of Information Technology")
+        st.caption("Re-accredited by NAAC with 'A++' Grade & NBA")
     st.subheader('Welcome to Student Marks Analysis')
     st.markdown("<p><TT>Designed and Developed by <a style='text-decoration:none;color:red' target='_blank' href='https://github.com/sasivatsal7122'>B.Sasi Vatsal</a></TT></p>", unsafe_allow_html=True)
     st.sidebar.write("Select the marks excel file to analyze")
