@@ -114,7 +114,7 @@ def marks_analysis(subject_1):
     st.plotly_chart(fig)
     
     st.subheader("One Student Performance:")
-    rollno = int(st.text_input("Enter roll number"))
+    rollno = int(st.text_input("Enter roll number","13"))
     rollno=f'20L31A54{rollno}'
     std_df = sub.loc[sub['roll']==rollno]
     std_pivot = std_df.transpose().reset_index()
@@ -129,7 +129,7 @@ def marks_analysis(subject_1):
     st.plotly_chart(fig)
     
     st.subheader("Find Students who secured more then given min marks")
-    x = int(st.text_input("Enter max marks (0-18) : "))
+    x = int(st.text_input("Enter max marks (0-18) : ","16"))
     df = sub.loc[sub['Total-18M']>=x]
     fig = px.bar(df,x="Total-18M", y="roll", text='Total-18M',orientation='h',title=f'{len(df)} members obtained greater than {x} marks ',width=1100, height=1500,)
     fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
@@ -140,7 +140,7 @@ def marks_analysis(subject_1):
     st.plotly_chart(fig)
     
     st.subheader("Find Students who secured marks between the given bound :")
-    x, y = str(st.text_input("Enter lower mark and higher marks between (0-18) : ")).split()
+    x, y = str(st.text_input("Enter lower mark and higher marks between (0-18) : ","5 12")).split()
     df = sub.loc[(sub['Total-18M']>=int(x))&(sub['Total-18M']<=int(y))]
     fig = px.bar(df,x="Total-18M", y="roll", text='Total-18M',orientation='h',title=f'{len(df)} members got marks in between {x} marks and {y} marks ',width=1100, height=1500,)
     fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
@@ -151,7 +151,7 @@ def marks_analysis(subject_1):
     st.plotly_chart(fig)
 
     st.subheader("Find Students who secured less then given min marks")
-    x = int(st.text_input("Enter min marks (0-18) : "))
+    x = int(st.text_input("Enter min marks (0-18) : ","9"))
     df = sub.loc[sub['Total-18M']<=x]
     fig = px.bar(df,x="Total-18M", y="roll", text='Total-18M',orientation='h',title=f'{len(df)} members obtained less than {x} marks ',width=1100, height=1500,)
     fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
