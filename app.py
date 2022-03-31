@@ -165,14 +165,20 @@ def marks_analysis(subject_1):
 def main():
     st.title("Vignan's Institute of Information technology")
     st.subheader('Welcome to Student Marks Analysis')
+    st.text("Designed and Developed by B.SasiVatsal")
     st.sidebar.write("Select the marks excel file and click analyze")
-    add_selectbox = st.sidebar.selectbox(
+    selected_option = st.sidebar.selectbox(
         "Select the Analysis Method",
         ("Mid marks - single subject", "Mid marks - multiple subjects", "Sem marks - single subject","Sem marks - Multiple subjects")
     )
-    subject_1 = st.sidebar.file_uploader("Choose a valid excel file")
-    st.sidebar.button('Analyze',on_click=marks_analysis(subject_1))
-    
+    if selected_option == "Mid marks - single subject":
+        subject_1 = st.sidebar.file_uploader("Choose a valid excel file")
+        sbtn  = st.sidebar.button('Analyze')
+        if sbtn:
+            marks_analysis(subject_1)
+    else:
+        st.subheader("choosed functionality wil be added soon")
+        
  
 if __name__=="__main__":
     main()
