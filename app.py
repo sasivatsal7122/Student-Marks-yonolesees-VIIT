@@ -229,10 +229,10 @@ def main():
         subject_1 = st.sidebar.file_uploader("Choose a valid excel file")
         #sbtn  = st.sidebar.button('Analyze')
         if (subject_1):
-            try:
-                marks_analysis(subject_1)
-            except:
-                st.header("Invalid Document Format uploaded, try again with a valid supported File Format")
+            
+            marks_analysis(subject_1)
+        
+            #st.header("Invalid Document Format uploaded, try again with a valid supported File Format")
     else:
         st.subheader("choosed functionality wil be added soon")
         
