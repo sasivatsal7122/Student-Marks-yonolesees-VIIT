@@ -92,6 +92,7 @@ def marks_analysis(subject_1):
             st.text("")
             st.write('Standard Deviation of marks in {} is {}'.format(std_dict['Part'][x],std_dict['Std'][x]))
         st.subheader("\nStudents performed well in {} with least standard deviation of {}".format(std_dict['Part'][1],std_dict['Std'][1]))
+        st.subheader("\nStudents performed bad in {} with Highest standard deviation of {}".format(std_dict['Part'][4],std_dict['Std'][4]))
     with bstat2:
         avg_df = sub.loc[:, sub.columns != 'roll']
         avg_df = avg_df.mean().to_frame().reset_index()
@@ -100,11 +101,13 @@ def marks_analysis(subject_1):
         fig = px.bar(avg_df,x='part-wise', y='avg-marks-obtained', text='avg-marks-obtained',)
         fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
         fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+        fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
         st.subheader("Avg Marks of class")
         st.plotly_chart(fig)
         
         fig = px.pie(std_df, values='Std', names='Part')
         fig.update_traces(textposition='inside', textinfo='percent+label')
+        fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
         st.subheader('Part Wise Standard Deviation')
         st.plotly_chart(fig)
         
@@ -122,6 +125,7 @@ def marks_analysis(subject_1):
         fig = px.bar(m_stats,x="Marks", y="no.of stds", text='no.of stds',width=950, height=630)
         fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
         fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+        fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
         st.plotly_chart(fig)
     with marks_class1:
         st.subheader("Marks Classification: ")
@@ -135,6 +139,7 @@ def marks_analysis(subject_1):
     fig.update_layout(
         yaxis = dict(autorange="reversed")
     )
+    fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
     st.plotly_chart(fig)
 
     st.subheader('Class performance in Part-B')
@@ -144,6 +149,7 @@ def marks_analysis(subject_1):
     fig.update_layout(
         yaxis = dict(autorange="reversed")
     )
+    fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
     st.plotly_chart(fig)
     
     st.subheader("Overall Class Performance")
@@ -153,6 +159,7 @@ def marks_analysis(subject_1):
     fig.update_layout(
         yaxis = dict(autorange="reversed")
     )
+    fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
     st.plotly_chart(fig)
     
     st.subheader("One Student Performance:")
@@ -172,6 +179,7 @@ def marks_analysis(subject_1):
         fig.update_layout(
             yaxis = dict(autorange="reversed")
         )
+        fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
         st.plotly_chart(fig)
     except:
         st.write("Invalid roll number entered, try again with valid roll number")
@@ -185,6 +193,7 @@ def marks_analysis(subject_1):
     fig.update_layout(
         yaxis = dict(autorange="reversed")
     )
+    fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
     st.plotly_chart(fig)
     
     st.subheader("Find Students who secured marks between the given bound :")
@@ -196,6 +205,7 @@ def marks_analysis(subject_1):
     fig.update_layout(
         yaxis = dict(autorange="reversed")
     )
+    fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
     st.plotly_chart(fig)
 
     st.subheader("Find Students who secured less then given min marks")
@@ -207,6 +217,7 @@ def marks_analysis(subject_1):
     fig.update_layout(
         yaxis = dict(autorange="reversed")
     )
+    fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
     st.plotly_chart(fig)
     return True
     
