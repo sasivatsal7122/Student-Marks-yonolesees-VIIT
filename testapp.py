@@ -107,6 +107,68 @@ def driver(nof_sub):
     st.text("")            
     options = st.multiselect('Select any Two Subjects: ',
                                 sub_name_ls,[sub_name_ls[0],sub_name_ls[1]])
+    col1,col2 = st.columns(2)    
+    with col1: 
+        st.subheader(f"Top 5 in {options[0]} secured :")
+        i=1; x1 = options[0];
+        x = sub_name_ls.index(x1) +1 ;y = sub_name_ls.index(options[1])+1
+        for index, std in globals()[f"top5_sub{x}"].iterrows():
+            marks = ((globals()[f"sub{y}"][globals()[f"sub{y}"]['roll'] == std['roll']]['Total-18M']).values)
+            rolss = std['roll']
+            tstr = f'{i}. '+ rolss +" has secured "+ str(*marks) +"M in "+ f'{options[1]}'
+            st.text(tstr)
+            i+=1
+    with col2:
+        st.subheader(f"Least 5 in {options[0]} secured :")
+        i=1; x1 = options[0];
+        x = sub_name_ls.index(x1) +1 ;y = sub_name_ls.index(options[1])+1
+        for index, std in globals()[f"least5_sub{x}"].iterrows():
+            marks = ((globals()[f"sub{y}"][globals()[f"sub{y}"]['roll'] == std['roll']]['Total-18M']).values)
+            rolss = std['roll']
+            tstr = f'{i}. '+ rolss +" has secured "+ str(*marks) +"M in "+ f'{options[1]}'
+            st.text(tstr)
+            i+=1
+    dfs_list = [];dfss_list = []
+    for i in range(1,nof_sub+1):
+        globals()[f"m_stats{i}"] = (globals()[f"sub{i}"]['Total-18M'].value_counts()).to_frame()
+        globals()[f"m_stats{i}"]= globals()[f"m_stats{i}"].reset_index()
+        globals()[f"m_stats{i}"].columns = ['Marks','no.of stds']
+        globals()[f"m_stats{i}"].sort_values(by=['Marks'],ascending=False,inplace=True)
+        globals()[f"m_stats{i}"] = globals()[f"m_stats{i}"].reset_index()
+        globals()[f"m_stats{i}"].drop(columns=['index'],inplace=True)
+        globals()[f"m_stats{i}_t"] = globals()[f"m_stats{i}"].set_index('Marks')
+        globals()[f"m_stats{i}_t"].rename(columns = {'no.of stds': globals()[f"sub_name{i}"] }, inplace = True)
+        globals()[f"m_stats{i}_t"].index.name = None
+        dfs_list.append(globals()[f"m_stats{i}_t"])
+    freq_df = pd.concat(dfs_list, axis=1)
+    freq_df = freq_df.iloc[::-1]
+    freq_df.fillna(0,inplace=True)
+    freq_df = freq_df.astype(int)
+    st.text("")
+    st.text("")
+    st.header("Frequency of marks Obtained In Each Subject : ")
+    st.text("")
+    st.dataframe(freq_df.head(40))
+
+    for i in range(1,nof_sub+1):
+            globals()[f"m_stats{i}"]['subject'] = globals()[f"sub_name{i}"]
+            dfss_list.append(globals()[f"m_stats{i}"])
+    first = dfss_list.pop(0)
+    final_mfreq_df_chart = first.append(dfss_list, ignore_index = True)
+    fig = px.histogram(final_mfreq_df_chart,orientation='h', y='Marks', x='no.of stds',color='subject', barmode='group' ,
+             height=700,text_auto=True,width=1250)
+    fig.update_layout(
+        xaxis_tickfont_size=14,
+        barmode='group',
+        bargap=0.15, 
+        bargroupgap=0.1 
+    )
+    fig.update_traces(textposition='outside')
+    fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
+    st.text(" ")
+    st.subheader("Marks Frequency")
+    st.plotly_chart(fig)
+
     
     
         
