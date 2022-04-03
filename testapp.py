@@ -9,6 +9,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.express as px
+import difflib
 from difflib import SequenceMatcher
 from PIL import Image
 from functools import reduce
@@ -168,6 +169,127 @@ def driver(nof_sub):
     st.text(" ")
     st.subheader("Marks Frequency")
     st.plotly_chart(fig)
+
+    
+    std_df_ls = []
+    for i in range(1,nof_sub+1):
+        data = [{'Part':'objective','Std': globals()[f"sub{i}"]['objective'].std()},
+        {'Part':'2A','Std':  globals()[f"sub{i}"]['2A'].std()},
+        {'Part':'2B','Std':  globals()[f"sub{i}"]['2B'].std()},
+        {'Part':'3A','Std':  globals()[f"sub{i}"]['3A'].std()},
+        {'Part':'3B','Std':  globals()[f"sub{i}"]['3B'].std()},
+        {'Part':'4','Std':  globals()[f"sub{i}"]['4'].std()},
+        {'Part':'Total-30M','Std':  globals()[f"sub{i}"]['Total-30M'].std()},
+        {'Part':'Total-18M','Std':  globals()[f"sub{i}"]['Total-18M'].std()}
+       ]
+        globals()[f"std_df{i}"] = pd.DataFrame(data)
+        globals()[f"chart_std_df{i}"] =  globals()[f"std_df{i}"]
+
+        globals()[f"std_df{i}"] =  globals()[f"std_df{i}"].set_index('Part')
+        globals()[f"std_df{i}"].index.name = None
+        globals()[f"std_df{i}"].rename(columns = {'Std':globals()[f"sub_name{i}"]}, inplace = True)
+
+        std_df_ls.append(globals()[f"std_df{i}"])
+    
+    st.subheader('Part Wise Standard deviations in each Subject')    
+    std_df = pd.concat(std_df_ls, axis=1)
+    std_df.fillna(0,inplace=True)
+    std_df = std_df.fillna(0)
+    st.dataframe(std_df.head(10))
+    
+    std_df_chart_ls = []
+    for i in range(1,nof_sub+1):
+            globals()[f"chart_std_df{i}"]['subject'] = globals()[f"sub_name{i}"]
+            std_df_chart_ls.append(globals()[f"chart_std_df{i}"])
+    
+    first = std_df_chart_ls.pop(0)
+    final_std_df_chart = first.append(std_df_chart_ls, ignore_index = True)
+    fig = px.histogram(final_std_df_chart, x='Part', y='Std', color='subject', barmode='group',
+                height=800,text_auto=True,width=1350)
+    fig.update_layout(
+        xaxis_tickfont_size=14,
+        barmode='group',
+        bargap=0.15, 
+        bargroupgap=0.1 
+    )
+    fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
+    st.subheader("Standard Deviation Chart")
+    st.plotly_chart(fig)
+    
+    
+    avg_df_ls = []
+    for i in range(1,nof_sub+1):
+        globals()[f"avg_df{i}"] = globals()[f"sub{i}"].loc[:, globals()[f"sub{i}"].columns != 'roll']
+        globals()[f"avg_df{i}"] = globals()[f"avg_df{i}"].mean().to_frame().reset_index()
+        globals()[f"avg_df{i}"] = globals()[f"avg_df{i}"].iloc[0:]
+        globals()[f"avg_df{i}"].columns = ['part-wise','avg-marks-obtained']
+        globals()[f"chart_avg_df{i}"] = globals()[f"avg_df{i}"]
+        globals()[f"avg_df{i}"]  = globals()[f"chart_avg_df{i}"].set_index('part-wise')
+        globals()[f"avg_df{i}"].index.name = None
+        globals()[f"avg_df{i}"].rename(columns = {'avg-marks-obtained':globals()[f"sub_name{i}"]}, inplace = True)
+        avg_df_ls.append(globals()[f"avg_df{i}"])
+    
+    st.subheader('Part Wise Averages in each Subject')    
+    avg_df = pd.concat(avg_df_ls, axis=1)
+    avg_df.fillna(0,inplace=True)
+    avg_df = avg_df.fillna(0)
+    st.dataframe(avg_df.head(10))
+    
+    avg_df_chart_ls = []
+    for i in range(1,nof_sub+1):
+        globals()[f"chart_avg_df{i}"]['subject'] = globals()[f"sub_name{i}"]
+        avg_df_chart_ls.append(globals()[f"chart_avg_df{i}"])
+    
+    first = avg_df_chart_ls.pop(0)
+    final_avg_df_chart = first.append(avg_df_chart_ls, ignore_index = True)
+    fig = px.histogram(final_avg_df_chart, x='part-wise', y='avg-marks-obtained', title="Avg Marks of class"
+             ,color='subject', barmode='group',
+             height=800,text_auto=True,width=1350)
+    fig.update_layout(
+        xaxis_tickfont_size=14,
+        barmode='group',
+        bargap=0.15, 
+        bargroupgap=0.1 
+    )
+    fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
+    st.subheader("Part wise Avg Marks Chart")
+    st.plotly_chart(fig)
+    
+    st.subheader("One Student Performance:")
+    st.text("Enter the year followed by last 4 digits")
+    st.text("ex: 20L31A5469 --> 205469")
+    rollno = int(st.text_input("Enter roll number","205413"))
+    roll_no = difflib.get_close_matches(str(rollno), list(globals()[f"sub{i}"]['roll']))
+    roll_no = roll_no[0]
+    stdu_pivot_ls = []
+    for i in range(1,nof_sub+1):
+        globals()[f"stdu_df{i}"] = globals()[f"sub{i}"].loc[globals()[f"sub{i}"]['roll']==roll_no]
+        globals()[f"stdu_pivot{i}"] = globals()[f"stdu_df{i}"].transpose().reset_index()
+        globals()[f"stdu_pivot{i}"] = globals()[f"stdu_pivot{i}"].iloc[1:]
+        globals()[f"stdu_pivot{i}"].columns = ['part-wise','marks-obtained']
+        globals()[f"stdu_pivot{i}"]['subject'] = globals()[f"sub_name{i}"]
+        stdu_pivot_ls.append(globals()[f"stdu_pivot{i}"])
+    
+    first = stdu_pivot_ls.pop(0)
+    final_stdu_pivot_chart = first.append(stdu_pivot_ls, ignore_index = True)  
+    fig = px.histogram(final_stdu_pivot_chart,y='part-wise', x='marks-obtained',color='subject' ,orientation='h',barmode='group',
+                  text_auto=True,height=700,width=1300)
+    fig.update_layout(
+        yaxis = dict(autorange="reversed")
+    )
+    fig.update_layout(
+        xaxis_tickfont_size=14,
+        yaxis_tickfont_size=14,
+        barmode='group',
+        bargap=0.35, 
+        bargroupgap=0.1
+    )  
+    fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
+    st.subheader(f'{roll_no} Performance')
+    st.plotly_chart(fig)
+
+
+        
 
     
     
