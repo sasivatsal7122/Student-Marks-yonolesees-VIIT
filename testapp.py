@@ -14,6 +14,8 @@ from difflib import SequenceMatcher
 from PIL import Image
 from functools import reduce
 
+
+
 sub_ls = ['sub1','sub2','sub3','sub4','sub5','sub6']
 sub_ls2 = ['sub','sub_sorted','top5_sub','least5_sub']
 
@@ -287,14 +289,80 @@ def driver(nof_sub):
     fig.update_layout(xaxis_fixedrange=True,yaxis_fixedrange=True)
     st.subheader(f'{roll_no} Performance')
     st.plotly_chart(fig)
-
-
-        
-
+    subs_ls = sub_name_ls; sasi=0
     
     
-        
-        
+    st.header("Students Who got same marks")
+    optionss = st.multiselect('Select any Two Subjects: ',
+                                subs_ls,[subs_ls[0],subs_ls[1]],key=sasi)
+    x = subs_ls.index(optionss[0]) + 1 ;y = subs_ls.index(optionss[1]) + 1
+    eqmarks_df = pd.DataFrame()
+    eqmarks_df['roll'] = globals()[f"sub{x}"]['roll']
+    eqmarks_df[globals()[f"sub_name{x}"]] = (globals()[f"sub{x}"]['Total-18M'])
+    eqmarks_df[globals()[f"sub_name{y}"]] = (globals()[f"sub{y}"]['Total-18M'])
+    eqmarks_df['marksmatch'] = np.where(eqmarks_df[globals()[f"sub_name{x}"]] == eqmarks_df[globals()[f"sub_name{y}"]], True, False)
+    eqmarks_df = eqmarks_df.loc[eqmarks_df.marksmatch, :]
+    eqmarks_df.drop('marksmatch',axis=1,inplace=True)
+    eqmarks_df.reset_index(inplace=True)
+    eqmarks_df.drop('index',axis=1,inplace=True)
+    st.dataframe(eqmarks_df)
+    
+    st.header("Check Performace of one subject w.r.t to another");vatsal=10
+    optionss = st.multiselect('Select any Two Subjects: ',
+                                subs_ls,[subs_ls[0],subs_ls[1]],key=vatsal)
+    marks_input = int(st.text_input("Enter Marks: ","15"))
+    x = subs_ls.index(optionss[0]) + 1 ;y = subs_ls.index(optionss[1]) + 1
+    eqmarks_df_2 = pd.DataFrame()
+    eqmarks_df_2['roll'] = globals()[f"sub{x}"]['roll']
+    eqmarks_df_2[globals()[f"sub_name{x}"]] = (globals()[f"sub{x}"]['Total-18M'])
+    eqmarks_df_2[globals()[f"sub_name{y}"]] = (globals()[f"sub{y}"]['Total-18M'])
+    eqmarks_df_2['marksmatch'] = np.where(eqmarks_df_2[globals()[f"sub_name{x}"]] == marks_input, True, False)
+    eqmarks_df_2 = eqmarks_df_2.loc[eqmarks_df_2.marksmatch, :]
+    eqmarks_df_2.drop('marksmatch',axis=1,inplace=True)
+    eqmarks_df_2.reset_index(inplace=True)
+    eqmarks_df_2.drop('index',axis=1,inplace=True)
+    st.dataframe(eqmarks_df_2)
+    
+    
+    st.header("Check Performace of one subject w.r.t to another");vatsall=100
+
+    optionss = st.multiselect('Select any Two Subjects for comparision between them: ',
+                                subs_ls,[subs_ls[0],subs_ls[1]],key=vatsall)
+    x1 = subs_ls.index(optionss[0]) + 1 ;y1 = subs_ls.index(optionss[1]) + 1
+    option_3 = st.radio(
+                "Select one of the Following for filtering : ",
+                ('Minimum', 'Maximum','Range'))
+    if option_3 == 'Maximum':
+        min_df = pd.DataFrame()
+        x = int(st.text_input("Enter Min Marks: ","16"))
+        min_df['roll'] = globals()[f"sub{x1}"].loc[globals()[f"sub{x1}"]['Total-18M']<=x,['roll']]
+        min_df[globals()[f"sub_name{x1}"]]= globals()[f"sub{x1}"].loc[globals()[f"sub{x1}"]['Total-18M']<=x,['Total-18M']] 
+        min_df[globals()[f"sub_name{y1}"]]= globals()[f"sub{y1}"]['Total-18M']
+        min_df.reset_index(inplace=True)
+        min_df.drop('index',axis=1,inplace=True)
+        st.text(f'{ len(min_df) } members secured less than {x} marks')
+        st.dataframe(min_df)
+    elif option_3 == 'Minimum':
+        max_df = pd.DataFrame()
+        x = int(st.text_input("Enter max Marks: ","12"))
+        max_df['roll'] = globals()[f"sub{x1}"].loc[globals()[f"sub{x1}"]['Total-18M']>=x,['roll']]
+        max_df[globals()[f"sub_name{x1}"]]= globals()[f"sub{x1}"].loc[globals()[f"sub{x1}"]['Total-18M']>=x,['Total-18M']] 
+        max_df[globals()[f"sub_name{y1}"]]= globals()[f"sub{y1}"]['Total-18M']
+        max_df.reset_index(inplace=True)
+        max_df.drop('index',axis=1,inplace=True)
+        st.text(f'{ len(max_df) } members secured greater than {x} marks')
+        st.dataframe(max_df)
+    else:
+        range_df = pd.DataFrame()
+        x, y = str(st.text_input("Enter lower mark and higher marks between (0-18) : ","5 12")).split()
+        range_df['roll'] = globals()[f"sub{x1}"].loc[( globals()[f"sub{x1}"]['Total-18M']>=int(x))&(globals()[f"sub{x1}"]['Total-18M']<=int(y)),['roll']]
+        range_df[globals()[f"sub_name{x1}"]] =  globals()[f"sub{x1}"].loc[( globals()[f"sub{x1}"]['Total-18M']>=int(x))&(globals()[f"sub{x1}"]['Total-18M']<=int(y)),['Total-18M']]
+        range_df[globals()[f"sub_name{y1}"]] =  globals()[f"sub{y1}"]['Total-18M']
+        range_df.reset_index(inplace=True)
+        range_df.drop('index',axis=1,inplace=True)
+        st.text(f'{len(range_df)} members got marks in between {x} marks and {y} marks ')
+        st.dataframe(range_df)
+                     
 
 def main():
     st.sidebar.write("Select the marks excel file to analyze")
