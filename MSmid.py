@@ -160,7 +160,8 @@ def MSmid_main():
         st.text("")
         st.header("Frequency of marks Obtained In Each Subject : ")
         st.text("")
-        st.dataframe(freq_df.head(40))
+        freq_df = freq_df.iloc[::-1]
+        st.dataframe(freq_df)
 
         for i in range(1,nof_sub+1):
                 globals()[f"m_stats{i}"]['subject'] = globals()[f"sub_name{i}"]
@@ -206,7 +207,7 @@ def MSmid_main():
         std_df = pd.concat(std_df_ls, axis=1)
         std_df.fillna(0,inplace=True)
         std_df = std_df.fillna(0)
-        st.dataframe(std_df.head(10))
+        st.dataframe(std_df)
         
         std_df_chart_ls = []
         for i in range(1,nof_sub+1):
@@ -244,7 +245,7 @@ def MSmid_main():
         avg_df = pd.concat(avg_df_ls, axis=1)
         avg_df.fillna(0,inplace=True)
         avg_df = avg_df.fillna(0)
-        st.dataframe(avg_df.head(10))
+        st.dataframe(avg_df)
         
         avg_df_chart_ls = []
         for i in range(1,nof_sub+1):
