@@ -11,11 +11,12 @@ import difflib
 from difflib import SequenceMatcher
 import math
 from PIL import Image
+import MSmid
 
 sns.set_theme(context='notebook',style='darkgrid',palette='deep',font='sans-serif',rc={'figure.figsize':(12,8)})
 
 
-def marks_analysis(subject_1):
+def SSmid(subject_1):
             
     sub = pd.read_excel(subject_1)
     sub_code = sub.at[1,"VIGNAN'S INSTITUTE OF INFORMATION TECHNOLOGY (AUTONOMOUS) : VISAKHAPATNAM"]
@@ -40,6 +41,8 @@ def marks_analysis(subject_1):
     sub_sorted = sub_sorted.loc[~(sub_sorted==0).all(axis=1)]
     top5_sub = sub_sorted.head(5)
     least5_sub = sub_sorted.tail(5)
+    roll_format = sub.iloc[0]['roll']
+    roll_format = roll_format[:2]+roll_format[6:]
     i=1
     j=1
     col1, col2 = st.columns((3,3))
@@ -165,7 +168,7 @@ def marks_analysis(subject_1):
     st.subheader("One Student Performance:")
     st.text("Enter the year followed by last 4 digits")
     st.text("ex: 20L31A5469 --> 205469")
-    rollno = int(st.text_input("Enter roll number","205413"))
+    rollno = int(st.text_input("Enter roll number",roll_format))
     try:
         rollno = difflib.get_close_matches(str(rollno), list(sub['roll']))
         rollno = rollno[0]
@@ -232,19 +235,21 @@ def main():
     st.subheader('Welcome to Student Marks Analysis')
     st.markdown("<p><TT>Designed and Developed by <a style='text-decoration:none;color:red' target='_blank' href='https://github.com/sasivatsal7122'>B.Sasi Vatsal</a></TT></p>", unsafe_allow_html=True)
     st.caption("20L31A5413 , Department of AI&DS")
-    st.sidebar.write("Select the marks excel file to analyze")
     selected_option = st.sidebar.selectbox(
         "Select the Analysis Method",
         ("Mid marks - single subject", "Mid marks - multiple subjects", "Sem marks - single subject","Sem marks - Multiple subjects")
     )
     if selected_option == "Mid marks - single subject":
+        st.sidebar.write("Select the marks excel file to analyze")
         subject_1 = st.sidebar.file_uploader("Choose a valid excel file")
-        #sbtn  = st.sidebar.button('Analyze')
         if (subject_1):
             try:
-                marks_analysis(subject_1)
+                SSmid(subject_1)
             except:
                 st.header("Invalid Document Format uploaded, try again with a valid supported File Format")
+    elif selected_option == "Mid marks - multiple subjects":
+        MSmid.MSmid_main()
+        
     else:
         st.subheader("choosed functionality wil be added soon")
         
