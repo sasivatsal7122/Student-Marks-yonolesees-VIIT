@@ -1,5 +1,6 @@
 from ast import Num
 from distutils.log import error
+from statistics import mode
 from pyparsing import col
 import streamlit as st
 import pandas as pd
@@ -225,12 +226,13 @@ def SSmid(subject_1):
     return True
     
 def main():
-    col1,col2 = st.columns((1,3))
+    st.set_page_config(layout="wide")
+    col1,col2 = st.columns((1,4))
     with col1:
         image = Image.open('Vignan_logo.png')
         st.image(image)
     with col2:
-        st.title("Vignan's Institute of Information Technology")
+        st.markdown("<h1> Vignan's Institute of<span style = 'display: block;'> Information Technology</span> </h1>",unsafe_allow_html=True)
         st.caption("Re-accredited by NAAC with 'A++' Grade & NBA")
     st.subheader('Welcome to Student Marks Analysis')
     st.markdown("<p><TT>Designed and Developed by <a style='text-decoration:none;color:red' target='_blank' href='https://github.com/sasivatsal7122'>B.Sasi Vatsal</a></TT></p>", unsafe_allow_html=True)
