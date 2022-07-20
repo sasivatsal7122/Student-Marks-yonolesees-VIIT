@@ -161,12 +161,13 @@ def MSmid_main():
         st.header("Frequency of marks Obtained In Each Subject : ")
         st.text("")
         freq_df = freq_df.iloc[::-1]
-        st.dataframe(freq_df)
+        st.table(freq_df)
 
         for i in range(1,nof_sub+1):
                 globals()[f"m_stats{i}"]['subject'] = globals()[f"sub_name{i}"]
                 dfss_list.append(globals()[f"m_stats{i}"])
         first = dfss_list.pop(0)
+        
         final_mfreq_df_chart = first.append(dfss_list, ignore_index = True)
         fig = px.histogram(final_mfreq_df_chart,orientation='h', y='Marks', x='no.of stds',color='subject', barmode='group' ,
                 height=700,text_auto=True,width=1250)
@@ -207,7 +208,7 @@ def MSmid_main():
         std_df = pd.concat(std_df_ls, axis=1)
         std_df.fillna(0,inplace=True)
         std_df = std_df.fillna(0)
-        st.dataframe(std_df)
+        st.table(std_df)
         
         std_df_chart_ls = []
         for i in range(1,nof_sub+1):
@@ -217,7 +218,7 @@ def MSmid_main():
         first = std_df_chart_ls.pop(0)
         final_std_df_chart = first.append(std_df_chart_ls, ignore_index = True)
         fig = px.histogram(final_std_df_chart, x='Part', y='Std', color='subject', barmode='group',
-                    height=800,text_auto=True,width=1350)
+                    height=800,width=1350,text_auto=True,)
         fig.update_layout(
             xaxis_tickfont_size=14,
             barmode='group',
@@ -245,7 +246,7 @@ def MSmid_main():
         avg_df = pd.concat(avg_df_ls, axis=1)
         avg_df.fillna(0,inplace=True)
         avg_df = avg_df.fillna(0)
-        st.dataframe(avg_df)
+        st.table(avg_df)
         
         avg_df_chart_ls = []
         for i in range(1,nof_sub+1):
@@ -316,7 +317,7 @@ def MSmid_main():
             eqmarks_df.drop('marksmatch',axis=1,inplace=True)
             eqmarks_df.reset_index(inplace=True)
             eqmarks_df.drop('index',axis=1,inplace=True)
-            st.dataframe(eqmarks_df)
+            st.table(eqmarks_df)
         
         
         st.header("Check Performace of one subject w.r.t to another");vatsal=10
@@ -334,7 +335,7 @@ def MSmid_main():
             eqmarks_df_2.drop('marksmatch',axis=1,inplace=True)
             eqmarks_df_2.reset_index(inplace=True)
             eqmarks_df_2.drop('index',axis=1,inplace=True)
-            st.dataframe(eqmarks_df_2)
+            st.table(eqmarks_df_2)
         
         
         st.header("Check Performace of one subject w.r.t to another");vatsall=100
@@ -355,7 +356,7 @@ def MSmid_main():
                 min_df.reset_index(inplace=True)
                 min_df.drop('index',axis=1,inplace=True)
                 st.text(f'{ len(min_df) } members secured less than {x} marks')
-                st.dataframe(min_df)
+                st.table(min_df)
             elif option_3 == 'Minimum':
                 max_df = pd.DataFrame()
                 x = int(st.text_input("Enter max Marks: ","12"))
@@ -365,7 +366,7 @@ def MSmid_main():
                 max_df.reset_index(inplace=True)
                 max_df.drop('index',axis=1,inplace=True)
                 st.text(f'{ len(max_df) } members secured greater than {x} marks')
-                st.dataframe(max_df)
+                st.table(max_df)
             else:
                 range_df = pd.DataFrame()
                 x, y = str(st.text_input("Enter lower mark and higher marks between (0-18) : ","5 12")).split()
@@ -375,7 +376,7 @@ def MSmid_main():
                 range_df.reset_index(inplace=True)
                 range_df.drop('index',axis=1,inplace=True)
                 st.text(f'{len(range_df)} members got marks in between {x} marks and {y} marks ')
-                st.dataframe(range_df)
+                st.table(range_df)
         
         st.header("Check Performace Students in Partwise");vatsals=13400
         option_4 = st.radio(
@@ -462,7 +463,7 @@ def MSmid_main():
         final_blah_df.set_index('index',inplace=True)
         final_blah_df.index.name = None
         final_blah_df.drop('roll',inplace=True,axis=1)
-        st.dataframe(final_blah_df)
+        st.table(final_blah_df)
         
     def main():
         st.sidebar.write("Select the marks excel file to analyze")
